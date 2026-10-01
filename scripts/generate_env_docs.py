@@ -389,11 +389,20 @@ def capability_hint(capability: str, lang: str) -> str:
     return cfg[key]
 
 
-def page_capability_hint(capability: str, lang: str, vendor: str) -> str:
+def page_capability_hint(capability: str, lang: str, vendor: str, models: list[str] | None = None) -> str:
     if vendor == "openai" and capability in {"image_generations", "image_edits"}:
+        has_gpt_image_2_5 = bool(set(models or []) & GPT_IMAGE_2_5_MODELS)
         if lang == "zh":
-            return "本接口提供 OpenAI Images API 的 gpt-image-2 图像能力。"
-        return "This endpoint provides gpt-image-2 image capabilities through the OpenAI Images API."
+            return (
+                "本接口提供 OpenAI Images API 的 GPT Image 2 与 GPT Image 2.5 图像能力。"
+                if has_gpt_image_2_5
+                else "本接口提供 OpenAI Images API 的 gpt-image-2 图像能力。"
+            )
+        return (
+            "This endpoint provides GPT Image 2 and GPT Image 2.5 capabilities through the OpenAI Images API."
+            if has_gpt_image_2_5
+            else "This endpoint provides gpt-image-2 image capabilities through the OpenAI Images API."
+        )
     return capability_hint(capability, lang)
 
 
@@ -423,6 +432,71 @@ GPT_IMAGE_2_SIZES = (
     "1024x2048",
 )
 
+GPT_IMAGE_2_5_MODELS = {
+    "gpt-image-2.5-flare",
+    "gpt-image-2.5-flare-oai",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-sunburst-oai",
+}
+
+
+def gpt_image_2_5_notes(lang: str, capability: str, models: list[str]) -> str:
+    if not (set(models) & GPT_IMAGE_2_5_MODELS):
+        return ""
+
+    if lang == "zh":
+        workflow = (
+            "推荐使用 `gpt-image-2.5-flare-oai` 进行快速图片生成，使用 `gpt-image-2.5-sunburst-oai` 进行精细图片编辑。"
+            if capability == "image_generations"
+            else "推荐使用 `gpt-image-2.5-sunburst-oai` 进行精细图片编辑，使用 `gpt-image-2.5-flare-oai` 进行快速图片生成。"
+        )
+        edit_note = (
+            "支持单图或多图 multipart 编辑，多个输入图片可重复提交 `image[]` 字段；同时支持 `moderation=low|auto`。\n\n"
+            if capability == "image_edits"
+            else ""
+        )
+        return (
+            "\n#### GPT Image 2.5\n\n"
+            + info_hint(workflow + "非 `-oai` 名称提供相同接口能力。")
+            + "\n"
+            + edit_note
+            + "`quality` 支持 `low`、`medium`、`high`、`xhigh`、`max` 和 `auto`，默认值为 `auto`。"
+            "透明背景需同时设置 `background=\"transparent\"` 和 `output_format=\"png\"` 或 `\"webp\"`。\n\n"
+            "费用按响应 `usage` 中的实际 token 用量计算（每 100 万 token）：\n\n"
+            "| 类型 | 输入 | 缓存输入 | 输出 |\n"
+            "| --- | ---: | ---: | ---: |\n"
+            "| 文本 | $5.00 | $1.25 | - |\n"
+            "| 图片 | $8.00 | $2.00 | $30.00 |\n\n"
+            "`usage.input_tokens_details` 区分文本、图片和缓存输入 token，`usage.output_tokens_details` 返回图片输出 token。"
+            "token 仅在顶层 `usage` 汇总返回，不会附加到每个 `data[]` 图片对象。\n"
+        )
+
+    workflow = (
+        "Use `gpt-image-2.5-flare-oai` for fast image generation and `gpt-image-2.5-sunburst-oai` for detailed image editing."
+        if capability == "image_generations"
+        else "Use `gpt-image-2.5-sunburst-oai` for detailed image editing and `gpt-image-2.5-flare-oai` for fast image generation."
+    )
+    edit_note = (
+        "The endpoint accepts one or more multipart input images; repeat the `image[]` field for multiple references. It also supports `moderation=low|auto`.\n\n"
+        if capability == "image_edits"
+        else ""
+    )
+    return (
+        "\n#### GPT Image 2.5\n\n"
+        + info_hint(workflow + " Names without the `-oai` suffix expose the same API capabilities.")
+        + "\n"
+        + edit_note
+        + "`quality` supports `low`, `medium`, `high`, `xhigh`, `max`, and `auto`, with `auto` as the default. "
+        "For transparent backgrounds, set `background=\"transparent\"` and use `output_format=\"png\"` or `\"webp\"`.\n\n"
+        "Requests are billed from actual token usage in the response (per one million tokens):\n\n"
+        "| Modality | Input | Cached input | Output |\n"
+        "| --- | ---: | ---: | ---: |\n"
+        "| Text | $5.00 | $1.25 | - |\n"
+        "| Image | $8.00 | $2.00 | $30.00 |\n\n"
+        "`usage.input_tokens_details` separates text, image, and cached input tokens, while `usage.output_tokens_details` reports image output tokens. "
+        "Tokens are aggregated in the top-level `usage` object and are not attached to individual `data[]` image objects.\n"
+    )
+
 
 def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]) -> str:
     if vendor != "openai" or "gpt-image-2" not in models or capability not in {"image_generations", "image_edits"}:
@@ -431,7 +505,7 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
     sizes = ", ".join(f"`{size}`" for size in GPT_IMAGE_2_SIZES)
     if lang == "zh" and capability == "image_generations":
         return (
-            "### 2. gpt-image-2 参数说明\n\n"
+            "### 2. 图像模型参数说明\n\n#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` 支持文本生成图像。`n` 可请求 1-10 张图像，实际返回数量可能少于请求数量。"
             )
@@ -447,10 +521,11 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
             "| `output_format` | 可选，支持 `png`、`jpeg`。 |\n"
             "| `output_compression` | 可选，范围 0-100，仅 `jpeg` 使用；`png` 应省略或设为 100。 |\n\n"
             f"支持尺寸：{sizes}\n"
+            + gpt_image_2_5_notes(lang, capability, models)
         )
     if lang == "zh" and capability == "image_edits":
         return (
-            "### 2. gpt-image-2 参数说明\n\n"
+            "### 2. 图像模型参数说明\n\n#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` 支持基于一张或多张输入图像进行编辑。`mask` 为可选参数，透明区域代表需要编辑的区域。"
             )
@@ -466,10 +541,11 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
             "| `background` | 可选，支持 `opaque`、`auto`。 |\n"
             "| `output_format` | 可选，支持 `png`、`jpeg`。 |\n\n"
             f"支持尺寸：{sizes}\n"
+            + gpt_image_2_5_notes(lang, capability, models)
         )
     if lang == "en" and capability == "image_generations":
         return (
-            "### 2. gpt-image-2 Parameter Notes\n\n"
+            "### 2. Image Model Parameter Notes\n\n#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` supports text-to-image generation. `n` may request 1-10 images, and the actual number of returned images can be lower than requested."
             )
@@ -485,10 +561,11 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
             "| `output_format` | Optional. Supports `png` and `jpeg`. |\n"
             "| `output_compression` | Optional. Range is 0-100 and applies only to `jpeg`; omit it for `png` or set it to 100. |\n\n"
             f"Supported sizes: {sizes}\n"
+            + gpt_image_2_5_notes(lang, capability, models)
         )
     if lang == "en" and capability == "image_edits":
         return (
-            "### 2. gpt-image-2 Parameter Notes\n\n"
+            "### 2. Image Model Parameter Notes\n\n#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` supports editing from one or more input images. `mask` is optional, and transparent areas represent regions to edit."
             )
@@ -504,6 +581,7 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
             "| `background` | Optional. Supports `opaque` and `auto`. |\n"
             "| `output_format` | Optional. Supports `png` and `jpeg`. |\n\n"
             f"Supported sizes: {sizes}\n"
+            + gpt_image_2_5_notes(lang, capability, models)
         )
     return ""
 
@@ -594,7 +672,7 @@ def build_capability_page(env: str, lang: str, vendor: str, capability: str, mod
     cfg = LANG_CONFIG[lang]
     title = f"# {vendor_name(vendor)} - {capability_title(capability, lang)}"
     overview = capability_overview(capability, vendor, lang)
-    hint = page_capability_hint(capability, lang, vendor)
+    hint = page_capability_hint(capability, lang, vendor, models)
     spec_vendor = openapi_spec_vendor(vendor, capability)
     blocks = "\n".join(
         build_openapi_block(spec_vendor, env, lang, path, vendor_name(vendor)) for path in openapi_path(capability)

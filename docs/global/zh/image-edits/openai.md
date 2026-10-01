@@ -5,15 +5,21 @@
 OpenAI 在当前环境中提供的图像编辑能力。
 
 {% hint style="success" %}
-本接口提供 OpenAI Images API 的 gpt-image-2 图像能力。
+本接口提供 OpenAI Images API 的 GPT Image 2 与 GPT Image 2.5 图像能力。
 {% endhint %}
 
 **模型列表：**
 
 * `gpt-image-2`
+* `gpt-image-2.5-flare`
+* `gpt-image-2.5-flare-oai`
+* `gpt-image-2.5-sunburst`
+* `gpt-image-2.5-sunburst-oai`
 
 
-### 2. gpt-image-2 参数说明
+### 2. 图像模型参数说明
+
+#### gpt-image-2
 
 {% hint style="info" %}
 `gpt-image-2` 支持基于一张或多张输入图像进行编辑。`mask` 为可选参数，透明区域代表需要编辑的区域。
@@ -31,6 +37,25 @@ OpenAI 在当前环境中提供的图像编辑能力。
 | `output_format` | 可选，支持 `png`、`jpeg`。 |
 
 支持尺寸：`auto`, `1024x1024`, `1024x1536`, `1536x1024`, `2048x2048`, `2048x1152`, `3840x2160`, `2160x3840`, `2048x1360`, `1360x2048`, `1152x2048`, `2048x1536`, `1536x2048`, `2048x880`, `880x2048`, `688x2048`, `2048x688`, `2048x1024`, `1024x2048`
+
+#### GPT Image 2.5
+
+{% hint style="info" %}
+推荐使用 `gpt-image-2.5-sunburst-oai` 进行精细图片编辑，使用 `gpt-image-2.5-flare-oai` 进行快速图片生成。非 `-oai` 名称提供相同接口能力。
+{% endhint %}
+
+支持单图或多图 multipart 编辑，多个输入图片可重复提交 `image[]` 字段；同时支持 `moderation=low|auto`。
+
+`quality` 支持 `low`、`medium`、`high`、`xhigh`、`max` 和 `auto`，默认值为 `auto`。透明背景需同时设置 `background="transparent"` 和 `output_format="png"` 或 `"webp"`。
+
+费用按响应 `usage` 中的实际 token 用量计算（每 100 万 token）：
+
+| 类型 | 输入 | 缓存输入 | 输出 |
+| --- | ---: | ---: | ---: |
+| 文本 | $5.00 | $1.25 | - |
+| 图片 | $8.00 | $2.00 | $30.00 |
+
+`usage.input_tokens_details` 区分文本、图片和缓存输入 token，`usage.output_tokens_details` 返回图片输出 token。token 仅在顶层 `usage` 汇总返回，不会附加到每个 `data[]` 图片对象。
 
 ### 3. 接口详情
 

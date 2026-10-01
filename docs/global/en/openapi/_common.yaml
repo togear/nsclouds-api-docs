@@ -614,6 +614,20 @@ components:
             image_tokens:
               type: integer
               description: Input tokens attributed to images.
+            cached_tokens:
+              type: integer
+              description: Cached input tokens.
+          additionalProperties: true
+        output_tokens_details:
+          type: object
+          description: Optional breakdown of output token usage.
+          properties:
+            text_tokens:
+              type: integer
+              description: Output tokens attributed to text.
+            image_tokens:
+              type: integer
+              description: Output tokens attributed to generated images.
           additionalProperties: true
     CreateChatCompletionRequest:
       type: object
