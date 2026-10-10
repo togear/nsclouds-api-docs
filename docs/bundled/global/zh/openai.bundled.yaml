@@ -500,7 +500,7 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 要调用的模型 ID。gpt-image-2-oai 按实际 usage Token 计费；原 gpt-image-2 按图像张数计费，单张价格由像素规模和生成质量 quality 档位确定。
+                  description: 要调用的模型 ID。gpt-image-2-oai 按实际 usage Token 计费；原 gpt-image-2 按图像张数计费，单张价格由像素规模和生成质量 quality 档位确定。 带 -oai 后缀的模型使用 OpenAI 直连资源，不带后缀使用 AWS 资源。GPT Image 2.5 全系列（包括 gpt-image-2.5-sunburst-oai）仅支持 Token 计费。
                   enum:
                     - gpt-image-2
                     - gpt-image-2-oai
@@ -722,7 +722,7 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 要调用的模型 ID。gpt-image-2-oai 按实际 usage Token 计费；原 gpt-image-2 按图像张数计费，单张价格由像素规模和生成质量 quality 档位确定。
+                  description: 要调用的模型 ID。gpt-image-2-oai 按实际 usage Token 计费；原 gpt-image-2 按图像张数计费，单张价格由像素规模和生成质量 quality 档位确定。 带 -oai 后缀的模型使用 OpenAI 直连资源，不带后缀使用 AWS 资源。GPT Image 2.5 全系列（包括 gpt-image-2.5-sunburst-oai）仅支持 Token 计费。
                   enum:
                     - gpt-image-2
                     - gpt-image-2-oai

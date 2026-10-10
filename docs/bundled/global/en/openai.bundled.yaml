@@ -500,7 +500,7 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 'Model ID to invoke. gpt-image-2-oai is billed by actual usage tokens; legacy gpt-image-2 is billed per image, with the unit price determined by pixel count and quality tier.'
+                  description: 'Model ID to invoke. gpt-image-2-oai is billed by actual usage tokens; legacy gpt-image-2 is billed per image, with the unit price determined by pixel count and quality tier. Models with the -oai suffix use direct OpenAI resources; models without it use AWS resources. All GPT Image 2.5 variants, including gpt-image-2.5-sunburst-oai, support token billing only.'
                   enum:
                     - gpt-image-2
                     - gpt-image-2-oai
@@ -722,7 +722,7 @@ paths:
               properties:
                 model:
                   type: string
-                  description: 'Model ID to invoke. gpt-image-2-oai is billed by actual usage tokens; legacy gpt-image-2 is billed per image, with the unit price determined by pixel count and quality tier.'
+                  description: 'Model ID to invoke. gpt-image-2-oai is billed by actual usage tokens; legacy gpt-image-2 is billed per image, with the unit price determined by pixel count and quality tier. Models with the -oai suffix use direct OpenAI resources; models without it use AWS resources. All GPT Image 2.5 variants, including gpt-image-2.5-sunburst-oai, support token billing only.'
                   enum:
                     - gpt-image-2
                     - gpt-image-2-oai

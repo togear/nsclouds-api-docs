@@ -20,14 +20,22 @@ OpenAI 在当前环境中提供的图像编辑能力。
 
 ### 2. 图像模型参数说明
 
-#### GPT Image 2 计费方式
+#### 模型资源与计费方式
 
 以下区别适用于本平台的模型名称，图像生成和图像编辑使用相同的计费规则。
 
-| 模型 | 计费方式 |
-| --- | --- |
-| `gpt-image-2-oai` | 按响应顶层 `usage` 中的实际 Token 用量计费，分别计算文本输入、图片输入和图片输出。 |
-| `gpt-image-2` | 保留原有按图像张数计费方式；单张价格由图像像素规模（宽 × 高）和生成质量 `quality` 的价格档位确定。 |
+带 `-oai` 后缀代表 OpenAI 直连资源，不带该后缀代表 AWS 资源。资源来源与计费方式分别如下：
+
+| 模型 | 资源来源 | 计费方式 |
+| --- | --- | --- |
+| `gpt-image-2-oai` | OpenAI 直连 | 按实际 Token 用量计费 |
+| `gpt-image-2` | AWS | 按图像张数计费，单张价格由像素规模和生成质量档位确定 |
+| `gpt-image-2.5-flare-oai` | OpenAI 直连 | 仅支持 Token 计费 |
+| `gpt-image-2.5-sunburst-oai` | OpenAI 直连 | 仅支持 Token 计费 |
+| `gpt-image-2.5-flare` | AWS | 仅支持 Token 计费 |
+| `gpt-image-2.5-sunburst` | AWS | 仅支持 Token 计费 |
+
+GPT Image 2.5 全系列均按响应顶层 `usage` 的实际 Token 用量结算，分别计算文本输入、图片输入和图片输出。`size`、`quality` 可能影响实际 Token 消耗，但不使用独立的按张、像素或质量档位价格。
 
 `gpt-image-2` 的费用按图像张数与对应档位的单张价格计算，不套用 Token 价格。`gpt-image-2-oai` 的 Token 在顶层 `usage` 汇总，不会为每个 `data[]` 图片单独返回。具体单价及缓存输入费率以所选模型的价格配置为准，GPT Image 2.5 的价格表不自动适用于 `gpt-image-2-oai`。
 
@@ -53,7 +61,7 @@ OpenAI 在当前环境中提供的图像编辑能力。
 #### GPT Image 2.5
 
 {% hint style="info" %}
-推荐使用 `gpt-image-2.5-sunburst-oai` 进行精细图片编辑，使用 `gpt-image-2.5-flare-oai` 进行快速图片生成。非 `-oai` 名称提供相同接口能力。
+推荐使用 `gpt-image-2.5-sunburst-oai` 进行精细图片编辑，使用 `gpt-image-2.5-flare-oai` 进行快速图片生成。所有带 `-oai` 后缀的 GPT Image 模型使用 OpenAI 直连资源，不带该后缀的模型使用 AWS 资源。GPT Image 2.5 全系列仅支持按 Token 计费，不支持按图像张数、像素或质量档位计费。
 {% endhint %}
 
 支持单图或多图 multipart 编辑，多个输入图片可重复提交 `image[]` 字段；同时支持 `moderation=low|auto`。

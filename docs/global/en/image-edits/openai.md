@@ -20,14 +20,22 @@ This endpoint provides GPT Image 2 and GPT Image 2.5 capabilities through the Op
 
 ### 2. Image Model Parameter Notes
 
-#### GPT Image 2 Billing
+#### Model Resources and Billing
 
 The following distinction applies to model names on this platform, for both image generation and editing.
 
-| Model | Billing method |
-| --- | --- |
-| `gpt-image-2-oai` | Billed by actual tokens in the top-level response `usage`, with separate text input, image input, and image output charges. |
-| `gpt-image-2` | Retains per-image billing; the unit price is selected by image pixel count (width × height) and the `quality` tier. |
+The `-oai` suffix identifies direct OpenAI resources; models without it use AWS resources. Resource origin and billing are listed separately below:
+
+| Model | Resource origin | Billing method |
+| --- | --- | --- |
+| `gpt-image-2-oai` | Direct OpenAI | Actual token usage |
+| `gpt-image-2` | AWS | Per image, with the unit price selected by pixel count and quality tier |
+| `gpt-image-2.5-flare-oai` | Direct OpenAI | Token billing only |
+| `gpt-image-2.5-sunburst-oai` | Direct OpenAI | Token billing only |
+| `gpt-image-2.5-flare` | AWS | Token billing only |
+| `gpt-image-2.5-sunburst` | AWS | Token billing only |
+
+All GPT Image 2.5 variants are billed by actual tokens in top-level response `usage`, with separate text input, image input, and image output charges. `size` and `quality` may affect token consumption, but do not select separate per-image, pixel-based, or quality-tier prices.
 
 The `gpt-image-2` charge is the image count multiplied by the applicable per-image tier price; token prices do not apply. For `gpt-image-2-oai`, tokens are aggregated in top-level `usage`, not reported for each `data[]` image. Use the selected model's pricing configuration for unit prices and cached-input rates; the GPT Image 2.5 price table does not automatically apply to `gpt-image-2-oai`.
 
@@ -53,7 +61,7 @@ Supported sizes: `auto`, `1024x1024`, `1024x1536`, `1536x1024`, `2048x2048`, `20
 #### GPT Image 2.5
 
 {% hint style="info" %}
-Use `gpt-image-2.5-sunburst-oai` for detailed image editing and `gpt-image-2.5-flare-oai` for fast image generation. Names without the `-oai` suffix expose the same API capabilities.
+Use `gpt-image-2.5-sunburst-oai` for detailed image editing and `gpt-image-2.5-flare-oai` for fast image generation. All GPT Image models with the `-oai` suffix use direct OpenAI resources; models without the suffix use AWS resources. All GPT Image 2.5 variants support token billing only, not per-image, pixel-based, or quality-tier billing.
 {% endhint %}
 
 The endpoint accepts one or more multipart input images; repeat the `image[]` field for multiple references. It also supports `moderation=low|auto`.

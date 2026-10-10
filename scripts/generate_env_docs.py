@@ -457,7 +457,7 @@ def gpt_image_2_5_notes(lang: str, capability: str, models: list[str]) -> str:
         )
         return (
             "\n#### GPT Image 2.5\n\n"
-            + info_hint(workflow + "非 `-oai` 名称提供相同接口能力。")
+            + info_hint(workflow + "所有带 `-oai` 后缀的 GPT Image 模型使用 OpenAI 直连资源，不带该后缀的模型使用 AWS 资源。GPT Image 2.5 全系列仅支持按 Token 计费，不支持按图像张数、像素或质量档位计费。")
             + "\n"
             + edit_note
             + "`quality` 支持 `low`、`medium`、`high`、`xhigh`、`max` 和 `auto`，默认值为 `auto`。"
@@ -483,7 +483,7 @@ def gpt_image_2_5_notes(lang: str, capability: str, models: list[str]) -> str:
     )
     return (
         "\n#### GPT Image 2.5\n\n"
-        + info_hint(workflow + " Names without the `-oai` suffix expose the same API capabilities.")
+        + info_hint(workflow + " All GPT Image models with the `-oai` suffix use direct OpenAI resources; models without the suffix use AWS resources. All GPT Image 2.5 variants support token billing only, not per-image, pixel-based, or quality-tier billing.")
         + "\n"
         + edit_note
         + "`quality` supports `low`, `medium`, `high`, `xhigh`, `max`, and `auto`, with `auto` as the default. "
@@ -506,20 +506,34 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
     billing_notes = ""
     if "gpt-image-2-oai" in models:
         billing_notes = (
-            "#### GPT Image 2 计费方式\n\n"
+            "#### 模型资源与计费方式\n\n"
             "以下区别适用于本平台的模型名称，图像生成和图像编辑使用相同的计费规则。\n\n"
-            "| 模型 | 计费方式 |\n| --- | --- |\n"
-            "| `gpt-image-2-oai` | 按响应顶层 `usage` 中的实际 Token 用量计费，分别计算文本输入、图片输入和图片输出。 |\n"
-            "| `gpt-image-2` | 保留原有按图像张数计费方式；单张价格由图像像素规模（宽 × 高）和生成质量 `quality` 的价格档位确定。 |\n\n"
+            "带 `-oai` 后缀代表 OpenAI 直连资源，不带该后缀代表 AWS 资源。资源来源与计费方式分别如下：\n\n"
+            "| 模型 | 资源来源 | 计费方式 |\n| --- | --- | --- |\n"
+            "| `gpt-image-2-oai` | OpenAI 直连 | 按实际 Token 用量计费 |\n"
+            "| `gpt-image-2` | AWS | 按图像张数计费，单张价格由像素规模和生成质量档位确定 |\n"
+            "| `gpt-image-2.5-flare-oai` | OpenAI 直连 | 仅支持 Token 计费 |\n"
+            "| `gpt-image-2.5-sunburst-oai` | OpenAI 直连 | 仅支持 Token 计费 |\n"
+            "| `gpt-image-2.5-flare` | AWS | 仅支持 Token 计费 |\n"
+            "| `gpt-image-2.5-sunburst` | AWS | 仅支持 Token 计费 |\n\n"
+            "GPT Image 2.5 全系列均按响应顶层 `usage` 的实际 Token 用量结算，分别计算文本输入、图片输入和图片输出。"
+            "`size`、`quality` 可能影响实际 Token 消耗，但不使用独立的按张、像素或质量档位价格。\n\n"
             "`gpt-image-2` 的费用按图像张数与对应档位的单张价格计算，不套用 Token 价格。"
             "`gpt-image-2-oai` 的 Token 在顶层 `usage` 汇总，不会为每个 `data[]` 图片单独返回。"
             "具体单价及缓存输入费率以所选模型的价格配置为准，GPT Image 2.5 的价格表不自动适用于 `gpt-image-2-oai`。\n\n"
             if lang == "zh"
-            else "#### GPT Image 2 Billing\n\n"
+            else "#### Model Resources and Billing\n\n"
             "The following distinction applies to model names on this platform, for both image generation and editing.\n\n"
-            "| Model | Billing method |\n| --- | --- |\n"
-            "| `gpt-image-2-oai` | Billed by actual tokens in the top-level response `usage`, with separate text input, image input, and image output charges. |\n"
-            "| `gpt-image-2` | Retains per-image billing; the unit price is selected by image pixel count (width × height) and the `quality` tier. |\n\n"
+            "The `-oai` suffix identifies direct OpenAI resources; models without it use AWS resources. Resource origin and billing are listed separately below:\n\n"
+            "| Model | Resource origin | Billing method |\n| --- | --- | --- |\n"
+            "| `gpt-image-2-oai` | Direct OpenAI | Actual token usage |\n"
+            "| `gpt-image-2` | AWS | Per image, with the unit price selected by pixel count and quality tier |\n"
+            "| `gpt-image-2.5-flare-oai` | Direct OpenAI | Token billing only |\n"
+            "| `gpt-image-2.5-sunburst-oai` | Direct OpenAI | Token billing only |\n"
+            "| `gpt-image-2.5-flare` | AWS | Token billing only |\n"
+            "| `gpt-image-2.5-sunburst` | AWS | Token billing only |\n\n"
+            "All GPT Image 2.5 variants are billed by actual tokens in top-level response `usage`, with separate text input, image input, and image output charges. "
+            "`size` and `quality` may affect token consumption, but do not select separate per-image, pixel-based, or quality-tier prices.\n\n"
             "The `gpt-image-2` charge is the image count multiplied by the applicable per-image tier price; token prices do not apply. "
             "For `gpt-image-2-oai`, tokens are aggregated in top-level `usage`, not reported for each `data[]` image. "
             "Use the selected model's pricing configuration for unit prices and cached-input rates; the GPT Image 2.5 price table does not automatically apply to `gpt-image-2-oai`.\n\n"
