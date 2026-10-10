@@ -11,6 +11,7 @@ OpenAI 在当前环境中提供的图像生成能力。
 **模型列表：**
 
 * `gpt-image-2`
+* `gpt-image-2-oai`
 * `gpt-image-2.5-flare`
 * `gpt-image-2.5-flare-oai`
 * `gpt-image-2.5-sunburst`
@@ -18,6 +19,17 @@ OpenAI 在当前环境中提供的图像生成能力。
 
 
 ### 2. 图像模型参数说明
+
+#### GPT Image 2 计费方式
+
+以下区别适用于本平台的模型名称，图像生成和图像编辑使用相同的计费规则。
+
+| 模型 | 计费方式 |
+| --- | --- |
+| `gpt-image-2-oai` | 按响应顶层 `usage` 中的实际 Token 用量计费，分别计算文本输入、图片输入和图片输出。 |
+| `gpt-image-2` | 保留原有按图像张数计费方式；单张价格由图像像素规模（宽 × 高）和生成质量 `quality` 的价格档位确定。 |
+
+`gpt-image-2` 的费用按图像张数与对应档位的单张价格计算，不套用 Token 价格。`gpt-image-2-oai` 的 Token 在顶层 `usage` 汇总，不会为每个 `data[]` 图片单独返回。具体单价及缓存输入费率以所选模型的价格配置为准，GPT Image 2.5 的价格表不自动适用于 `gpt-image-2-oai`。
 
 #### gpt-image-2
 

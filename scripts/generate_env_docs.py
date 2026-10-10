@@ -503,9 +503,30 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
         return ""
 
     sizes = ", ".join(f"`{size}`" for size in GPT_IMAGE_2_SIZES)
+    billing_notes = ""
+    if "gpt-image-2-oai" in models:
+        billing_notes = (
+            "#### GPT Image 2 计费方式\n\n"
+            "以下区别适用于本平台的模型名称，图像生成和图像编辑使用相同的计费规则。\n\n"
+            "| 模型 | 计费方式 |\n| --- | --- |\n"
+            "| `gpt-image-2-oai` | 按响应顶层 `usage` 中的实际 Token 用量计费，分别计算文本输入、图片输入和图片输出。 |\n"
+            "| `gpt-image-2` | 保留原有按图像张数计费方式；单张价格由图像像素规模（宽 × 高）和生成质量 `quality` 的价格档位确定。 |\n\n"
+            "`gpt-image-2` 的费用按图像张数与对应档位的单张价格计算，不套用 Token 价格。"
+            "`gpt-image-2-oai` 的 Token 在顶层 `usage` 汇总，不会为每个 `data[]` 图片单独返回。"
+            "具体单价及缓存输入费率以所选模型的价格配置为准，GPT Image 2.5 的价格表不自动适用于 `gpt-image-2-oai`。\n\n"
+            if lang == "zh"
+            else "#### GPT Image 2 Billing\n\n"
+            "The following distinction applies to model names on this platform, for both image generation and editing.\n\n"
+            "| Model | Billing method |\n| --- | --- |\n"
+            "| `gpt-image-2-oai` | Billed by actual tokens in the top-level response `usage`, with separate text input, image input, and image output charges. |\n"
+            "| `gpt-image-2` | Retains per-image billing; the unit price is selected by image pixel count (width × height) and the `quality` tier. |\n\n"
+            "The `gpt-image-2` charge is the image count multiplied by the applicable per-image tier price; token prices do not apply. "
+            "For `gpt-image-2-oai`, tokens are aggregated in top-level `usage`, not reported for each `data[]` image. "
+            "Use the selected model's pricing configuration for unit prices and cached-input rates; the GPT Image 2.5 price table does not automatically apply to `gpt-image-2-oai`.\n\n"
+        )
     if lang == "zh" and capability == "image_generations":
         return (
-            "### 2. 图像模型参数说明\n\n#### gpt-image-2\n\n"
+            "### 2. 图像模型参数说明\n\n" + billing_notes + "#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` 支持文本生成图像。`n` 可请求 1-10 张图像，实际返回数量可能少于请求数量。"
             )
@@ -525,7 +546,7 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
         )
     if lang == "zh" and capability == "image_edits":
         return (
-            "### 2. 图像模型参数说明\n\n#### gpt-image-2\n\n"
+            "### 2. 图像模型参数说明\n\n" + billing_notes + "#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` 支持基于一张或多张输入图像进行编辑。`mask` 为可选参数，透明区域代表需要编辑的区域。"
             )
@@ -545,7 +566,7 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
         )
     if lang == "en" and capability == "image_generations":
         return (
-            "### 2. Image Model Parameter Notes\n\n#### gpt-image-2\n\n"
+            "### 2. Image Model Parameter Notes\n\n" + billing_notes + "#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` supports text-to-image generation. `n` may request 1-10 images, and the actual number of returned images can be lower than requested."
             )
@@ -565,7 +586,7 @@ def gpt_image_2_notes(lang: str, vendor: str, capability: str, models: list[str]
         )
     if lang == "en" and capability == "image_edits":
         return (
-            "### 2. Image Model Parameter Notes\n\n#### gpt-image-2\n\n"
+            "### 2. Image Model Parameter Notes\n\n" + billing_notes + "#### gpt-image-2\n\n"
             + info_hint(
                 "`gpt-image-2` supports editing from one or more input images. `mask` is optional, and transparent areas represent regions to edit."
             )

@@ -14386,6 +14386,23 @@
       }
     },
     {
+      "model_name": "gpt-image-2-oai",
+      "litellm_params": {
+        "api_base": "https://api.novita.ai/openai/v1",
+        "custom_llm_provider": "ppio",
+        "model": "ppio/gpt-image-2",
+        "weight": 1
+      },
+      "model_info": {
+        "key": "ppio/gpt-image-2-oai",
+        "litellm_provider": "ppio",
+        "mode": "image_generation",
+        "supported_endpoints": ["/v1/images/generations", "/v1/images/edits"],
+        "model_details": "GPT Image 2 with token billing; the legacy gpt-image-2 model retains per-image billing by pixel count and quality tier.",
+        "original_provider": "openai"
+      }
+    },
+    {
       "model_name": "gpt-image-2.5-flare",
       "litellm_params": {
         "api_base": "https://api.novita.ai/openai",

@@ -11,6 +11,7 @@ This endpoint provides GPT Image 2 and GPT Image 2.5 capabilities through the Op
 **Supported models：**
 
 * `gpt-image-2`
+* `gpt-image-2-oai`
 * `gpt-image-2.5-flare`
 * `gpt-image-2.5-flare-oai`
 * `gpt-image-2.5-sunburst`
@@ -18,6 +19,17 @@ This endpoint provides GPT Image 2 and GPT Image 2.5 capabilities through the Op
 
 
 ### 2. Image Model Parameter Notes
+
+#### GPT Image 2 Billing
+
+The following distinction applies to model names on this platform, for both image generation and editing.
+
+| Model | Billing method |
+| --- | --- |
+| `gpt-image-2-oai` | Billed by actual tokens in the top-level response `usage`, with separate text input, image input, and image output charges. |
+| `gpt-image-2` | Retains per-image billing; the unit price is selected by image pixel count (width × height) and the `quality` tier. |
+
+The `gpt-image-2` charge is the image count multiplied by the applicable per-image tier price; token prices do not apply. For `gpt-image-2-oai`, tokens are aggregated in top-level `usage`, not reported for each `data[]` image. Use the selected model's pricing configuration for unit prices and cached-input rates; the GPT Image 2.5 price table does not automatically apply to `gpt-image-2-oai`.
 
 #### gpt-image-2
 
